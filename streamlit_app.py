@@ -35,8 +35,8 @@ le.fit()
 
 # Divide train - test set
 from sklearn.model_selection import train_test_split
-X = df2.drop([user_id, burnout_score, burnout_risk], axis=1)
-y = df2[burnout_score]
+X = df2.drop(["user_id", "burnout_score", "burnout_risk"], axis=1)
+y = df2["burnout_score"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,random_state=42)
 
 # Build and train model
@@ -247,10 +247,10 @@ elif page == "Prediction and Solution":
     sleep_hours = st.slider()
     task_completion_rate = st.slider()
     day_type = st.selectbox(["Weekday", "Weekend"]) 
-    day_type = (day_type == "Weekday") ? 0 : 1
+    day_type =  0  if (day_type == "Weekday") else 1
 
     # Compose argument into an array
-    user_inputs = np.array([day_type,work_hours,screen_time_hours,meetings_count,breaks_taken,after_hours_work,sleep_hours,task_completion_rate])
+    user_inputs = np.array(["day_type","work_hours","screen_time_hours","meetings_count","breaks_taken","after_hours_work","sleep_hours","task_completion_rate"])
 
     # Predict
     user_prediction = model.predict(user_inputs)
