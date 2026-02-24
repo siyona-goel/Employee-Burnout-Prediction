@@ -20,9 +20,40 @@ st.image("burnout.jpg")
 st.write("   ")
 st.write("   ")
 st.write("   ")
-df = pd.read_csv("work_from_home_burnout_dataset.csv")
 
 ## Step 02 - Load dataset
+df = pd.read_csv("work_from_home_burnout_dataset.csv")
+
+# BUILD MODEL
+# Clean data
+df2 = df.dropna()
+
+# Label non-number features 
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+le.fit()
+
+# Divide train - test set
+from sklearn.model_selection import train_test_split
+X = df2.drop([user_id, burnout_score, burnout_risk], axis=1)
+y = df2[burnout_score]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,random_state=42)
+
+# Build and train model
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluate model
+from sklearn.metrics import mean_squared_error,mean_absolute_error,r2_score
+
+y_pred = model.predict(X_test)
+
+rmse = np.sqrt(mean_squared_error(y_test,y_pred))
+mae = mean_absolute_error(y_test,y_pred)
+r2 = r2_score(y_test,y_pred)
+
+
 if page == "Introduction":
     st.subheader("Welcome to the Employee Burnout Predictive Dashboard!")
 
@@ -63,7 +94,7 @@ if page == "Introduction":
     if st.button("Show Describe Table"):
         st.dataframe(df.describe())
 
-if page == "Visualization 📊":
+elif page == "Visualization":
 
     st.title("Data Visualization & Insights 📊")
     st.write("In this section, we explore how work habits influence employee burnout.")
@@ -157,3 +188,71 @@ Additionally, work hours and screen time are highly correlated with each other (
     """)
 
     st.success("These insights will guide our Linear Regression model on the next page.")
+
+# Page 3: 
+elif page == "Linear Regression Model": 
+
+    # Model information
+    st.title("Burnout Prediction Model")
+    st.subheader("What Drives Employee Exhaustion?")
+    st.markdown("---")
+
+    st.text("""
+        We built a Linear Regression model to predict employee burnout score based on work behavior and lifestyle variables.
+
+        Our goal is not only to predict burnout, but to identify which factors increase or decrease it the most.
+
+        The target variable is burnout_score, a continuous measure of employee exhaustion.        
+    """)
+
+    st.subheader("How Our Model Works")
+    st.markdown("##### Input Features")
+    st.markdown("""
+        - work_hours
+        - screen_time_hours
+        - meetings_count
+        - breaks_taken
+        - after_hours_work
+        - sleep_hours
+        - task_completion_rate
+        - day_type (encoded)
+    """)
+
+    st.markdown("##### Train - Test Size")
+    st.markdown("""
+        - Train set: 80%
+        - Test set: 20%
+    """)
+
+    st.markdown("##### Model Performance")
+    st.text("R² score indicates how well our model explains variation in burnout. A higher R² means better predictive power.")
+    st.markdown(f"""
+        - R² Score: {r2}
+        - MAE (Mean Absolute Error): {mae}
+        - MSE: {rmse}
+    """)
+
+
+    # Linear Regression Chart
+
+# Page 4:
+elif page == "Prediction and Solution":
+    
+    # Input arguments
+    work_hours = st.slider()
+    screen_time_hours = st.slider()
+    meetings_count = st.slider()
+    breaks_taken = st.slider()
+    after_hours_work = st.slider()
+    sleep_hours = st.slider()
+    task_completion_rate = st.slider()
+    day_type = st.selectbox(["Weekday", "Weekend"]) 
+    day_type = (day_type == "Weekday") ? 0 : 1
+
+    # Compose argument into an array
+    user_inputs = np.array([day_type,work_hours,screen_time_hours,meetings_count,breaks_taken,after_hours_work,sleep_hours,task_completion_rate])
+
+    # Predict
+    user_prediction = model.predict(user_inputs)
+
+    
