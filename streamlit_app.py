@@ -31,7 +31,8 @@ df2 = df.dropna()
 # Label non-number features 
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
-le.fit()
+# le.fit()
+df2["day_type"] = le.fit_transform(df2["day_type"])
 
 # Divide train - test set
 from sklearn.model_selection import train_test_split
@@ -239,20 +240,44 @@ elif page == "Linear Regression Model":
 elif page == "Prediction and Solution":
     
     # Input arguments
-    work_hours = st.slider()
+    ''' work_hours = st.slider()
     screen_time_hours = st.slider()
     meetings_count = st.slider()
     breaks_taken = st.slider()
     after_hours_work = st.slider()
     sleep_hours = st.slider()
-    task_completion_rate = st.slider()
-    day_type = st.selectbox(["Weekday", "Weekend"]) 
+    task_completion_rate = st.slider()'''
+
+    work_hours = st.slider("Work Hours", 0.0, 16.0, 8.0)
+    screen_time_hours = st.slider("Screen Time Hours", 0.0, 16.0, 8.0)
+    meetings_count = st.slider("Meetings Count", 0, 10, 2)
+    breaks_taken = st.slider("Breaks Taken", 0, 10, 2)
+    after_hours_work = st.slider("After Hours Work (0=No, 1=Yes)", 0, 1, 0)
+    sleep_hours = st.slider("Sleep Hours", 0.0, 12.0, 7.0)
+    task_completion_rate = st.slider("Task Completion Rate (%)", 0.0, 100.0, 80.0)
+
+    # day_type = st.selectbox(["Weekday", "Weekend"]) 
+    day_type = st.selectbox("Day Type", ["Weekday", "Weekend"])
     day_type =  0  if (day_type == "Weekday") else 1
 
     # Compose argument into an array
-    user_inputs = np.array(["day_type","work_hours","screen_time_hours","meetings_count","breaks_taken","after_hours_work","sleep_hours","task_completion_rate"])
+    
+    # user_inputs = np.array(["day_type","work_hours","screen_time_hours","meetings_count","breaks_taken","after_hours_work","sleep_hours","task_completion_rate"])
+    user_inputs = np.array([[ 
+    work_hours,
+    screen_time_hours,
+    meetings_count,
+    breaks_taken,
+    after_hours_work,
+    sleep_hours,
+    task_completion_rate,
+    day_type
+    ]])
 
     # Predict
-    user_prediction = model.predict(user_inputs)
+    # user_prediction = model.predict(user_inputs)
 
+    if st.button("Predict Burnout"):
+        user_prediction = model.predict(user_inputs)
+        st.success(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
     
