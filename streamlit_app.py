@@ -235,49 +235,104 @@ elif page == "Linear Regression Model":
 
 
     # Linear Regression Chart
+    
 
 # Page 4:
 elif page == "Prediction and Solution":
     
+    st.title("Free Stress Diagnosis")
+    st.text("Use our model to predict your stress level of any day and get free advice to improve your wellbeing!")
+    st.markdown("---")
+
     # Input arguments
-    ''' work_hours = st.slider()
-    screen_time_hours = st.slider()
-    meetings_count = st.slider()
-    breaks_taken = st.slider()
-    after_hours_work = st.slider()
-    sleep_hours = st.slider()
-    task_completion_rate = st.slider()'''
+    day_type = st.selectbox("Day Type", ["Weekday", "Weekend"])
+    day_type =  0  if (day_type == "Weekday") else 1
 
     work_hours = st.slider("Work Hours", 0.0, 16.0, 8.0)
     screen_time_hours = st.slider("Screen Time Hours", 0.0, 16.0, 8.0)
     meetings_count = st.slider("Meetings Count", 0, 10, 2)
     breaks_taken = st.slider("Breaks Taken", 0, 10, 2)
-    after_hours_work = st.slider("After Hours Work (0=No, 1=Yes)", 0, 1, 0)
     sleep_hours = st.slider("Sleep Hours", 0.0, 12.0, 7.0)
     task_completion_rate = st.slider("Task Completion Rate (%)", 0.0, 100.0, 80.0)
 
-    # day_type = st.selectbox(["Weekday", "Weekend"]) 
-    day_type = st.selectbox("Day Type", ["Weekday", "Weekend"])
-    day_type =  0  if (day_type == "Weekday") else 1
+    after_hours_work = st.radio("After hours work",["No","Yes"])
+    after_hours_work = 0 if (after_hours_work == "No") else 1
 
     # Compose argument into an array
-    
-    # user_inputs = np.array(["day_type","work_hours","screen_time_hours","meetings_count","breaks_taken","after_hours_work","sleep_hours","task_completion_rate"])
     user_inputs = np.array([[ 
+    day_type,
     work_hours,
     screen_time_hours,
     meetings_count,
     breaks_taken,
     after_hours_work,
     sleep_hours,
-    task_completion_rate,
-    day_type
+    task_completion_rate
     ]])
 
     # Predict
-    # user_prediction = model.predict(user_inputs)
-
     if st.button("Predict Burnout"):
         user_prediction = model.predict(user_inputs)
-        st.success(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
-    
+
+        # Advice section
+        # Case 1: High
+        if user_prediction >= 110:
+            st.error(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
+            st.title("Stress Level: HIGH (110–140)")
+            st.markdown("""
+            ### 🚨 High Risk – Immediate Action Required
+
+            Your predicted stress level is critically high.  
+            Immediate changes are strongly recommended.
+
+            #### 🛑 Immediate Interventions
+            - Eliminate **after-hours work**
+            - Reduce daily work hours to **8 hours or less**
+            - Increase sleep to **7+ hours**
+            - Reduce meetings by at least **30%**
+            - Take **4+ short breaks daily**
+            - Consider temporary workload redistribution
+            - Encourage use of employee wellness or mental health resources
+
+            📌 **Manager Insight:** Immediate HR or leadership review recommended to prevent burnout and productivity loss.
+        """)
+
+        # Case 2: Medium
+        elif user_prediction >= 70:
+            st.warning(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
+            st.title("Stress Level: MEDIUM (70–110)")
+            st.markdown("""
+                ### ⚠️ Risk Zone – Prevent Escalation
+
+                Your stress level is moderate. Without adjustments, it may increase over time.
+
+                #### 🔧 Recommended Adjustments
+                - Reduce daily work hours by **30–60 minutes**
+                - Increase sleep by **at least 1 hour**
+                - Limit **after-hours work** to urgent tasks only
+                - Take **3+ structured breaks**
+                - Reduce unnecessary meetings
+                - Block **focused work time** in your calendar
+
+                📌 **Manager Insight:** Consider redistributing workload or reviewing meeting frequency.
+            """)
+
+        # Case 4: Low
+        else:
+            st.success(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
+            st.title("Stress Level: LOW (0–69)")
+            st.markdown("""
+                ### 🌿 You're in a Healthy Range
+
+                Your predicted stress level is currently low.  
+                Maintain these habits to prevent future burnout.
+
+                #### ✅ Recommended Actions
+                - Maintain **7–8 hours of sleep** consistently  
+                - Keep **after-hours work minimal**
+                - Take **at least 2 short breaks** during work hours  
+                - Protect your **work-life boundaries**
+                - Engage in **light daily physical activity (20–30 min)**
+
+                📌 **Manager Insight:** Continue current workload structure and monitor weekly trends.
+            """)
