@@ -45,6 +45,29 @@ REGPLOT_LINE_KWS = {
     "zorder": 3
 }
 
+st.markdown(
+    """
+    <style>
+    /* Unfilled track (background) */
+    div[data-baseweb="slider"] [data-testid="stSliderTrack"] {
+        background-color: #ffb6c1 !important;
+    }
+
+    /* Filled track */
+    div[data-baseweb="slider"] [data-testid="stSliderTrackFill"] {
+        background-color: #ff69b4 !important;
+    }
+
+    /* Thumb (circle) */
+    div[data-baseweb="slider"] div[role="slider"] {
+        background-color: #ff69b4 !important;
+        border-color: #ff69b4 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # HEATMAP: Define custom pink colormap
 import matplotlib.colors as mcolors
 pink_cmap = mcolors.LinearSegmentedColormap.from_list(
@@ -295,8 +318,8 @@ elif page == "Linear Regression Model":
 # Page 4:
 elif page == "Prediction and Solution":
     
-    st.title("Free Stress Diagnosis")
-    st.text("Use our model to predict your stress level of any day and get free advice to improve your wellbeing!")
+    st.title("Free Burnout Prediction")
+    st.text("Use our model to predict your burnout level at any day and get advice to improve your wellbeing!")
     st.markdown("---")
 
     # Input arguments
@@ -333,11 +356,11 @@ elif page == "Prediction and Solution":
         # Case 1: High
         if user_prediction >= 110:
             st.error(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
-            st.title("Stress Level: HIGH (110–140)")
+            st.title("Burnout Level: HIGH (110–140)")
             st.markdown("""
             ### 🚨 High Risk – Immediate Action Required
 
-            Your predicted stress level is critically high.  
+            Your predicted burnout level is critically high.  
             Immediate changes are strongly recommended.
 
             #### 🛑 Immediate Interventions
@@ -355,11 +378,11 @@ elif page == "Prediction and Solution":
         # Case 2: Medium
         elif user_prediction >= 70:
             st.warning(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
-            st.title("Stress Level: MEDIUM (70–110)")
+            st.title("Burnout Level: MEDIUM (70–110)")
             st.markdown("""
                 ### ⚠️ Risk Zone – Prevent Escalation
 
-                Your stress level is moderate. Without adjustments, it may increase over time.
+                Your burnout level is moderate. Without adjustments, it may increase over time.
 
                 #### 🔧 Recommended Adjustments
                 - Reduce daily work hours by **30–60 minutes**
@@ -375,11 +398,11 @@ elif page == "Prediction and Solution":
         # Case 4: Low
         else:
             st.success(f"Predicted Burnout Score: {round(user_prediction[0], 2)}")
-            st.title("Stress Level: LOW (0–69)")
+            st.title("Burnout Level: LOW (0–69)")
             st.markdown("""
                 ### 🌿 You're in a Healthy Range
 
-                Your predicted stress level is currently low.  
+                Your predicted burnout level is currently low.  
                 Maintain these habits to prevent future burnout.
 
                 #### ✅ Recommended Actions
