@@ -3,13 +3,55 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import sklearn
 
 st.set_page_config(
     page_title="Employee Burnout Predictive Dashboard 🫂 ",
     layout="centered",
     page_icon="🫂",
 )
+
+# VISUALIZATION THEME
+# General theme
+sns.set_theme(
+    style="whitegrid",
+    context="paper",
+    rc={
+        "figure.facecolor": "#F5F7FA",
+        "axes.facecolor": "#FFFFFF",
+        "grid.color": "#E6E6E6",
+        "grid.alpha": 0.6,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+    }
+)
+
+# LINEPLOT: Default colors for points and line
+UNIVERSAL_COLOR = "#ff69b4"
+LINE_WIDTH = 1
+LINE_ALPHA = 0.8
+MARKER_SIZE = 4
+
+# REGPLOT: Default colors for points and line
+REGPLOT_SCATTER_KWS = {
+    "color": "#ff69b4",   # pink 
+    "alpha": 0.6,
+    "s": 60,
+    "zorder": 1
+}
+
+REGPLOT_LINE_KWS = {
+    "color": "#d33977",  # dark pink line
+    "linewidth": 1,
+    "zorder": 3
+}
+
+# HEATMAP: Define custom pink colormap
+import matplotlib.colors as mcolors
+pink_cmap = mcolors.LinearSegmentedColormap.from_list(
+    "", ["#373efa","#f9eaff", "#ff1e78"]   # light pink → dark pink
+)
+
+# ---------------------------------------------------------------------
 
 ## Step 01 - Setup
 st.sidebar.title("Employee Burnout Predictive Dashboard")
@@ -105,7 +147,7 @@ elif page == "Visualization":
     st.subheader("1️⃣ Burnout Score Distribution")
 
     fig1, ax1 = plt.subplots()
-    sns.histplot(df["burnout_score"], kde=True, ax=ax1)
+    sns.histplot(df["burnout_score"], kde=True, ax=ax1, color=UNIVERSAL_COLOR)
     ax1.set_xlabel("Burnout Score")
     ax1.set_ylabel("Frequency")
     st.pyplot(fig1)
@@ -120,7 +162,13 @@ elif page == "Visualization":
     st.subheader("2️⃣ Burnout by Day Type (Weekday vs Weekend)")
 
     fig2, ax2 = plt.subplots()
-    sns.boxplot(x="day_type", y="burnout_score", data=df, ax=ax2)
+    sns.boxplot(x="day_type", y="burnout_score", data=df, ax=ax2, color=UNIVERSAL_COLOR, 
+        boxprops=dict(facecolor="#ff69b4", color=UNIVERSAL_COLOR, linewidth=2),
+        whiskerprops=dict(color=UNIVERSAL_COLOR, linewidth=1),
+        capprops=dict(color=UNIVERSAL_COLOR, linewidth=1),
+        medianprops=dict(color="white", linewidth=1),
+        flierprops=dict(marker="o", color=UNIVERSAL_COLOR, alpha=0.6, markersize=6) # The dots
+    )
     st.pyplot(fig2)
 
     st.markdown("""
@@ -134,7 +182,7 @@ elif page == "Visualization":
     work_hours_avg = df.groupby("work_hours")["burnout_score"].mean().reset_index()
 
     fig3, ax3 = plt.subplots()
-    sns.lineplot(x="work_hours", y="burnout_score", data=work_hours_avg, marker="o", ax=ax3)
+    sns.lineplot(x="work_hours", y="burnout_score", data=work_hours_avg, marker="o", ax=ax3, markersize=MARKER_SIZE, color=UNIVERSAL_COLOR, linewidth=LINE_WIDTH, alpha=LINE_ALPHA)
     ax3.set_ylabel("Average Burnout Score")
     st.pyplot(fig3)
 
@@ -150,7 +198,7 @@ elif page == "Visualization":
     screen_avg = df.groupby("screen_time_hours")["burnout_score"].mean().reset_index()
 
     fig4, ax4 = plt.subplots()
-    sns.lineplot(x="screen_time_hours", y="burnout_score", data=screen_avg, marker="o", ax=ax4)
+    sns.lineplot(x="screen_time_hours", y="burnout_score", data=screen_avg, marker="o", ax=ax4, markersize=MARKER_SIZE, color=UNIVERSAL_COLOR, linewidth=LINE_WIDTH, alpha=LINE_ALPHA)
     ax4.set_ylabel("Average Burnout Score")
     st.pyplot(fig4)
 
@@ -164,7 +212,7 @@ elif page == "Visualization":
     st.subheader("5️⃣ Sleep Hours vs Burnout (Trend Line)")
 
     fig5, ax5 = plt.subplots()
-    sns.regplot(x="sleep_hours", y="burnout_score", data=df, ax=ax5)
+    sns.regplot(x="sleep_hours", y="burnout_score", data=df, ax=ax5,scatter_kws=REGPLOT_SCATTER_KWS,line_kws=REGPLOT_LINE_KWS)
     st.pyplot(fig5)
 
     st.markdown("""
@@ -178,7 +226,7 @@ elif page == "Visualization":
     st.subheader("6️⃣ Correlation Matrix")
 
     fig6, ax6 = plt.subplots(figsize=(8,6))
-    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
+    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap=pink_cmap)
     st.pyplot(fig6)
 
     st.markdown("""
@@ -235,7 +283,14 @@ elif page == "Linear Regression Model":
 
 
     # Linear Regression Chart
-    
+    lr_fig = plt.figure(figsize=(8,6))
+    sns.regplot(x=y_pred, y=y_test,scatter_kws=REGPLOT_SCATTER_KWS,line_kws=REGPLOT_LINE_KWS)
+    plt.title("Actual and Predicted Burnout Score")
+    plt.xlabel("Predicted Score")
+    plt.ylabel("Actual Score")
+
+    st.pyplot(lr_fig)
+
 
 # Page 4:
 elif page == "Prediction and Solution":
